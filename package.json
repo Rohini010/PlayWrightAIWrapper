@@ -2,15 +2,34 @@
   "name": "playwright_rohini",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+
+
+ "scripts": {
+    "clean:allure": "rimraf allure-results allure-report",
+    "clean:playwright": "rimraf playwright-report",
+    "clean": "npm run clean:allure && npm run clean:playwright",
+    "test": "npx playwright test",
+    "test:html": "npx playwright test --reporter=html",
+    "test:allure": "npx playwright test --reporter=line,allure-playwright",
+    "test:all": "npm run test:allure",
+    "test:addProduct": "npx playwright test tests/addProduct.spec.js --reporter=line,allure-playwright",
+    "test:cartVerify": "npx playwright test tests/cartVerify.spec.js --reporter=line,allure-playwright",
+    "test:checkout": "npx playwright test tests/checkout.spec.js --reporter=line,allure-playwright",
+    "test:endToEnd": "npx playwright test tests/endToEnd.spec.js --reporter=line,allure-playwright",
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report"    
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@playwright/test": "^1.55.0",
-    "@types/node": "^24.4.0",
-    "allure-playwright": "^3.4.1"
+   "@playwright/test": "^1.54.1",
+    "@types/node": "^24.1.0",
+    "allure-commandline": "^2.29.0",
+    "allure-playwright": "^3.3.2",
+    "rimraf": "^5.0.0"
   },
   "dependencies": {
     "levenshtein": "^1.0.5"
