@@ -13,7 +13,9 @@ pipeline {
     }
 
     environment {
+        // Cache Playwright browsers in a persistent folder inside workspace
         PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}\\.playwright"
+        PLAYWRIGHT_DOWNLOAD_TIMEOUT = "600000" // 10 min timeout for downloads
     }
 
     stages {
@@ -27,15 +29,25 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                // For multibranch pipeline, use the branch Jenkins scans
-                checkout scm
+                git branch: 'main', 
+                    url: 'https://github.com/Rohini010/PlayWrightAIWrapper.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
+                // Install npm packages
                 bat 'npm install'
-                bat 'npx playwright install'
+
+                // Only install Playwright browsers if not present
+                script {
+                    if (!fileExists("${env.PLAYWRIGHT_BROWSERS_PATH}/chromium-1400")) {
+                        echo "Playwright browsers not found. Downloading..."
+                        bat 'npx playwright install --force --quiet'
+                    } else {
+                        echo "Playwright browsers already downloaded. Skipping download."
+                    }
+                }
             }
         }
 
