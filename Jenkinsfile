@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     tools {
         nodejs "node18"
     }
@@ -13,9 +14,8 @@ pipeline {
     }
 
     environment {
-        // Cache Playwright browsers in a persistent folder inside workspace
+        // Use workspace path for Playwright browsers to avoid repeated downloads
         PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}\\.playwright"
-        PLAYWRIGHT_DOWNLOAD_TIMEOUT = "600000" // 10 min timeout for downloads
     }
 
     stages {
@@ -29,21 +29,19 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', 
-                    url: 'https://github.com/Rohini010/PlayWrightAIWrapper.git'
+                // Single branch: checkout the branch Jenkins is building
+                checkout scm
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Install npm packages
                 bat 'npm install'
 
-                // Only install Playwright browsers if not present
                 script {
                     if (!fileExists("${env.PLAYWRIGHT_BROWSERS_PATH}/chromium-1400")) {
                         echo "Playwright browsers not found. Downloading..."
-                        bat 'npx playwright install --force --quiet'
+                        bat 'npx playwright install --force'
                     } else {
                         echo "Playwright browsers already downloaded. Skipping download."
                     }
@@ -96,8 +94,10 @@ pipeline {
 
     post {
         always {
+            // Archive Playwright HTML report
             archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
 
+            // Generate Allure report
             allure([
                 reportBuildPolicy: 'ALWAYS',
                 includeProperties: false,
