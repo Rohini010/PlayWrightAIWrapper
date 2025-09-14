@@ -2,8 +2,6 @@
   "name": "playwright_rohini",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-
 
  "scripts": {
     "clean:allure": "rimraf allure-results allure-report",
