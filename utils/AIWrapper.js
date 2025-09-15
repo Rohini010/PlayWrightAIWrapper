@@ -9,11 +9,6 @@ class AIWrapper {
     this.page = page;
   }
 
-  /**
-   * Main method to find a working locator
-   * @param {Object} locatorInfo - {css, xpath, text, role, fuzzyThreshold}
-   * @param {string} elementName - friendly name for logging
-   */
   async findWorkingLocator(locatorInfo, elementName = "element") {
     const strategies = ["css", "xpath", "role", "text"];
 
@@ -40,9 +35,8 @@ class AIWrapper {
             break;
         }
 
-        const count = await locator.count();
-        if (count > 0) {
-          const firstLocator = locator.first(); // fix: apply type to returned locator
+        if ((await locator.count()) > 0) {
+          const firstLocator = locator.first();
           firstLocator._usedLocatorType = key;
           firstLocator._isFuzzy = false;
           console.log(`[Locator Found] "${elementName}" using ${key} locator`);
@@ -53,15 +47,15 @@ class AIWrapper {
       }
     }
 
-    //  Fuzzy search fallback
+    // Fuzzy search fallback
     if (!ENABLE_FUZZY || !locatorInfo.text) {
       throw new Error(`No locator found for "${elementName}"`);
     }
 
     const threshold = locatorInfo.fuzzyThreshold || FUZZY_THRESHOLD;
-    const allElements = this.page.locator("a, button, span, div");
+    const allElements = this.page.locator("a, button, span, div, input, label");
     const count = await allElements.count();
-    let candidates = [];
+    const candidates = [];
     const seenTexts = new Set();
 
     for (let i = 0; i < count; i++) {
@@ -69,24 +63,21 @@ class AIWrapper {
         const el = allElements.nth(i);
         if (!(await el.isVisible())) continue;
 
-        const elText = (await el.textContent())?.trim();
+        const elText = (await el.textContent())?.trim() || "";
         if (!elText || seenTexts.has(elText)) continue;
         seenTexts.add(elText);
 
+        // Skip elements too different in length
         if (Math.abs(elText.length - locatorInfo.text.length) > 15) continue;
 
         const similarity = this.similarity(elText, locatorInfo.text);
-
-        // fuzzy comparison log
-        // console.log(`[Fuzzy Candidate] "${elText}" | Target: "${locatorInfo.text}" | Similarity: ${similarity.toFixed(3)}`);
-
         candidates.push({ text: elText, similarity, index: i });
-      } catch (err) {
+      } catch {
         // ignore errors
       }
     }
 
-    // pick top candidate if above threshold
+    // Pick top candidate if similarity above threshold
     candidates.sort((a, b) => b.similarity - a.similarity);
     if (candidates.length > 0 && candidates[0].similarity >= threshold) {
       const locator = allElements.nth(candidates[0].index);
@@ -95,7 +86,7 @@ class AIWrapper {
       console.log(
         `[Fuzzy Match] "${
           candidates[0].text
-        }" selected for "${elementName}" with similarity ${candidates[0].similarity.toFixed(
+        }" selected for "${elementName}" | Similarity: ${candidates[0].similarity.toFixed(
           3
         )}`
       );
@@ -105,6 +96,7 @@ class AIWrapper {
     throw new Error(`No locator found for "${elementName}"`);
   }
 
+  // Similarity calculation (Levenshtein-based)
   similarity(a, b) {
     if (!a || !b) return 0;
     let longer = a.length > b.length ? a : b;
@@ -131,6 +123,7 @@ class AIWrapper {
               );
       }
     }
+
     return matrix[b.length][a.length];
   }
 }

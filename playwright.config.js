@@ -19,11 +19,11 @@ export default defineConfig({
   expect: {
     timeout: 45000,
   },
-  retries: 1,
+  // retries: 1,
   reporter: [["line"], ["html", { open: "never" }], ["allure-playwright"]],
 
   use: {
-    headless: false, // headless for CI/CD
+    headless: true, // headless for CI/CD
     // storageState: "tests/setup/auth.json",
     screenshot: "only-on-failure",
     video: "on",
