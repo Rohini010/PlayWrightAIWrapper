@@ -4,19 +4,19 @@ const { ensureAuth } = require("../utils/SessionManager");
 
 const test = base.extend({
   storageState: async ({}, use) => {
-    // ✅ Always ensures auth.json exists and is valid
+    // Always ensures auth.json exists and is valid
     const storageStatePath = await ensureAuth();
     await use(storageStatePath);
   },
 
   page: async ({ context }, use) => {
-    // ✅ Context already has storageState injected
+    // Context already has storageState injected
     const page = await context.newPage();
     await page.goto("https://automationexercise.com/");
 
     // Double-check: if session expired during run → regenerate
     if (!(await page.$('a[href="/logout"]'))) {
-      console.log("⚠️ Session not valid, refreshing login...");
+      console.log(" Session not valid, refreshing login...");
       const { doLogin, authFile } = require("../utils/SessionManager");
       await doLogin();
 
