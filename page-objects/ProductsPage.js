@@ -8,11 +8,10 @@ class ProductsPage extends BasePage {
 
     this.locators = {
       productsLink: {
-        // Intentionally "wrong" locators to trigger fallback
         css: "a[href*='/products']",
         xpath: "//a[contains(@href, '/products)]",
-        text: "Products", // fuzzy should fix this -> "Products"
-        role: "link", // role is correct, but text is slightly off
+        text: "Products",
+        role: "link",
       },
       productWrapperCss: ".product-image-wrapper .single-products",
 

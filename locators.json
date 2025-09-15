@@ -1,0 +1,21 @@
+{
+  "Email": ".login-form input[type='email']",
+  "Password": ".login-form input[type='password']",
+  "Login Button": ".login-form button[type='submit']",
+  "Logout": "a[href='/logout']",
+  "element": "form[action='/login'] p",
+  "Products link": "a[href*='/products']",
+  "Continue Shopping": "//button[contains(text(),'Continue Shopping')]",
+  "Cart nav link": ".nav a[href*='/view_cart']",
+  "Order message": "#ordermsg textarea",
+  "Place Order": "a.check_out",
+  "Name on Card": "input[name='name_on_card']",
+  "Card Number": "input[name='card_number']",
+  "CVC": "input[name='cvc']",
+  "Expiry Month": "input[name='expiry_month']",
+  "Expiry Year": "input[name='expiry_year']",
+  "Confirm Order": ".col-md-12 button[type='submit']",
+  "Confirmation message": ".text-center",
+  "Proceed To Checkout": ".check_out",
+  "Remove Blue Top from cart": "tr:has-text(\"Blue Top\") a.cart_quantity_delete"
+}

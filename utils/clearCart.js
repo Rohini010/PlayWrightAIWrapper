@@ -1,15 +1,15 @@
-// utils/clearCart.js
 async function clearCart(page) {
   await page.goto("https://automationexercise.com/view_cart");
 
-  // Remove all items if cart is not empty
-  const removeButtons = page.locator(".cart_quantity_delete");
-  const count = await removeButtons.count();
+  const removeButtonLocator = page.locator(".cart_quantity_delete");
 
-  for (let i = 0; i < count; i++) {
-    await removeButtons.nth(0).click(); // always delete first item
+  while ((await removeButtonLocator.count()) > 0) {
+    await removeButtonLocator.first().click();
+    // Wait for the button to disappear (DOM update)
     await page.waitForTimeout(500);
   }
+
+  console.log("Cart cleared successfully");
 }
 
-module.exports = { clearCart }; //  Correct export
+module.exports = { clearCart };
